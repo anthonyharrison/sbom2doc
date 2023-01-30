@@ -9,6 +9,8 @@ from collections import ChainMap
 from lib4sbom.parser import SBOMParser
 
 import sbom2doc.console as console
+import sbom2doc.markdown as markdown
+import sbom2doc.pdf as pdf
 from sbom2doc.version import VERSION
 
 # CLI processing
@@ -44,6 +46,14 @@ def main(argv=None):
     )
 
     # Add format option
+    output_group.add_argument(
+        "-f",
+        "--format",
+        action="store",
+        help="Output format (default: output to console)",
+        choices=["console", "markdown", "pdf"],
+        default="console",
+    )
 
     output_group.add_argument(
         "-o",
@@ -59,6 +69,7 @@ def main(argv=None):
         "input_file": "",
         "output_file": "",
         "debug": False,
+        "format": "console",
     }
 
     raw_args = parser.parse_args(argv[1:])
@@ -73,6 +84,10 @@ def main(argv=None):
         print("[ERROR] SBOM name must be specified.")
         return -1
 
+    if args["format"] != "console" and args["output_file"] == "":
+        print("[ERROR] Output filename must be specified.")
+        return -1
+
     if args["debug"]:
         print("Input file", args["input_file"])
         print("Output file", args["output_file"])
@@ -82,7 +97,12 @@ def main(argv=None):
     try:
         sbom_parser.parse_file(input_file)
 
-        console.send_to_console(sbom_parser, input_file)
+        if args["format"] == "markdown":
+            markdown.generate_markdown(sbom_parser, input_file, args["output_file"])
+        elif args["format"] == "pdf":
+            pdf.generate_pdf(sbom_parser, input_file, args["output_file"])
+        else:
+            console.send_to_console(sbom_parser, input_file)
 
     except FileNotFoundError:
         print(f"{input_file} not found")
