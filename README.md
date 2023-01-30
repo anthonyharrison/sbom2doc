@@ -155,6 +155,59 @@ The following commands will generate a summary of the contents of the SBOM to th
 
 ```
 sbom2doc --input flask.spdx 
+
+╭──────────────╮
+│ SBOM Summary │
+╰──────────────╯
+┏━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Item          ┃ Details                ┃
+┡━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ SBOM File     │ /tmp/flask.spdx        │
+│ SBOM Type     │ spdx                   │
+│ Version       │ SPDX-2.2               │
+│ Name          │ flask                  │
+│ Creator       │ Tool:sbom4python-0.7.0 │
+│ Created       │ 2023-01-30T18:10:18Z   │
+│ Files         │ 0                      │
+│ Packages      │ 6                      │
+│ Relationships │ 7                      │
+└───────────────┴────────────────────────┘
+╭─────────────────╮
+│ Package Summary │
+╰─────────────────╯
+┏━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Name         ┃ Version ┃ Supplier                                     ┃ License      ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━┩
+│ flask        │ 2.2.2   │ Armin Ronacher (armin.ronacher@active-4.com) │ BSD-3-Clause │
+│ click        │ 8.0.3   │ Armin Ronacher (armin.ronacher@active-4.com) │ BSD-3-Clause │
+│ itsdangerous │ 2.1.2   │ Armin Ronacher (armin.ronacher@active-4.com) │ BSD-3-Clause │
+│ jinja2       │ 3.0.2   │ Armin Ronacher (armin.ronacher@active-4.com) │ BSD-3-Clause │
+│ markupsafe   │ 2.1.1   │ Armin Ronacher (armin.ronacher@active-4.com) │ BSD-3-Clause │
+│ werkzeug     │ 2.2.2   │ Armin Ronacher (armin.ronacher@active-4.com) │ BSD-3-Clause │
+└──────────────┴─────────┴──────────────────────────────────────────────┴──────────────┘
+╭─────────────────╮
+│ License Summary │
+╰─────────────────╯
+┏━━━━━━━━━━━━━━┳━━━━━━━┓
+┃ License      ┃ Count ┃
+┡━━━━━━━━━━━━━━╇━━━━━━━┩
+│ BSD-3-Clause │ 6     │
+└──────────────┴───────┘
+╭──────────────╮
+│ NTIA Summary │
+╰──────────────╯
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┓
+┃ Element                            ┃ Status ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━┩
+│ All file information provided?     │ True   │
+│ All package information provided?  │ True   │
+│ Creator identified?                │ True   │
+│ Creation time identified?          │ True   │
+│ Dependency relationships provided? │ True   │
+└────────────────────────────────────┴────────┘
+
+NTIA conformant True
+                                                                    
 ```
 
 ## Licence
