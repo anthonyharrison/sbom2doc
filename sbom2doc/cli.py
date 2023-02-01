@@ -8,9 +8,7 @@ from collections import ChainMap
 
 from lib4sbom.parser import SBOMParser
 
-import sbom2doc.console as console
-import sbom2doc.markdown as markdown
-import sbom2doc.pdf as pdf
+import sbom2doc.generator as generator
 from sbom2doc.version import VERSION
 
 # CLI processing
@@ -97,12 +95,9 @@ def main(argv=None):
     try:
         sbom_parser.parse_file(input_file)
 
-        if args["format"] == "markdown":
-            markdown.generate_markdown(sbom_parser, input_file, args["output_file"])
-        elif args["format"] == "pdf":
-            pdf.generate_pdf(sbom_parser, input_file, args["output_file"])
-        else:
-            console.send_to_console(sbom_parser, input_file)
+        generator.generate_document(
+            args["format"], sbom_parser, input_file, args["output_file"]
+        )
 
     except FileNotFoundError:
         print(f"{input_file} not found")

@@ -1,4 +1,3 @@
 lib4sbom
 rich
 reportlab
-cve-bin-tool
