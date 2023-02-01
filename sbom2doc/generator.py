@@ -53,13 +53,14 @@ def generate_document(format, sbom_parser, filename, outfile):
             # Minimum elements are ID, Name
             id = file.get("id", None)
             name = file.get("name", None)
-            file_type = ", ".join(t for t in file.get("filetype", None))
-            license = file.get("licenseconcluded", None)
-            copyright = file.get("copyrighttext", "-")
-            if license is not None:
-                sbom_licenses.append(license)
+            filetype = file.get("filetype", None)
+            if filetype is not None:
+                file_type = ", ".join(t for t in filetype)
             else:
-                license = "NOT KNOWN"
+                file_type = "NOT KNOWN"
+            license = file.get("licenseconcluded", "NOT KNOWN")
+            copyright = file.get("copyrighttext", "-")
+            sbom_licenses.append(license)
             sbom_document.addrow([name, file_type, license, copyright])
             if id is None or name is None:
                 files_valid = False
@@ -77,11 +78,8 @@ def generate_document(format, sbom_parser, filename, outfile):
             name = package.get("name", None)
             version = package.get("version", None)
             supplier = package.get("supplier", None)
-            license = package.get("licenseconcluded", None)
-            if license is not None:
-                sbom_licenses.append(license)
-            else:
-                license = "NOT KNOWN"
+            license = package.get("licenseconcluded", "NOT KNOWN")
+            sbom_licenses.append(license)
             sbom_document.addrow([name, version, supplier, license])
             if (
                 id is None
