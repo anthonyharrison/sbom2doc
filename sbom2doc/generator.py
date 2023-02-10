@@ -31,9 +31,12 @@ def generate_document(format, sbom_parser, filename, outfile):
     sbom_document.addrow(["Version", document.get_version()])
     sbom_document.addrow(["Name", document.get_name()])
     creator_identified = False
-    for c in document.get_creator():
-        creator_identified = True
-        sbom_document.addrow(["Creator", f"{c[0]}:{c[1]}"])
+    creator = document.get_creator()
+    # If creator is missing, will return None
+    if creator is not None:
+        for c in creator:
+            creator_identified = True
+            sbom_document.addrow(["Creator", f"{c[0]}:{c[1]}"])
     sbom_document.addrow(["Created", document.get_created()])
     sbom_document.addrow(["Files", str(len(files))])
     sbom_document.addrow(["Packages", str(len(packages))])
