@@ -43,6 +43,13 @@ def main(argv=None):
         help="add debug information",
     )
 
+    output_group.add_argument(
+        "--include-license",
+        action="store_true",
+        default=False,
+        help="add license text",
+    )
+
     # Add format option
     output_group.add_argument(
         "-f",
@@ -68,6 +75,7 @@ def main(argv=None):
         "output_file": "",
         "debug": False,
         "format": "console",
+        "include_license": False,
     }
 
     raw_args = parser.parse_args(argv[1:])
@@ -89,6 +97,7 @@ def main(argv=None):
     if args["debug"]:
         print("Input file", args["input_file"])
         print("Output file", args["output_file"])
+        print("Include license text", args["include_license"])
 
     sbom_parser = SBOMParser()
     # Load SBOM - will autodetect SBOM type
@@ -96,7 +105,11 @@ def main(argv=None):
         sbom_parser.parse_file(input_file)
 
         generator.generate_document(
-            args["format"], sbom_parser, input_file, args["output_file"]
+            args["format"],
+            sbom_parser,
+            input_file,
+            args["output_file"],
+            args["include_license"],
         )
 
     except FileNotFoundError:

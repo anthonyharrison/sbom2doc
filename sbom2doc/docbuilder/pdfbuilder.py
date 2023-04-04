@@ -59,7 +59,7 @@ class PDFBuilder(DocBuilder):
 
     list = ListStyle(
         name="list",
-        fontSize=12,
+        fontSize=10,
         fontName=document_font,
         leading=12,
         textColor=black,
@@ -90,20 +90,29 @@ class PDFBuilder(DocBuilder):
     def _spacer(self):
         self.contents.append(self.spacer)
 
-    def heading(self, level, title):
+    def heading(self, level, title, number=True):
         self._spacer()
         if level == 1:
             self.headingnumber[level] += 1
+            self.headingnumber[level + 1] = 1
+        elif level == 2:
+            self.headingnumber[level] += 1
+        elif level > 2:
+            print("Ooops.... Level", level)
+        if number:
             self.contents.append(
                 Paragraph(str(self.headingnumber[level]) + ". " + title, self.h1)
             )
         else:
-            print("Ooops.... Level", level)
+            self.contents.append(Paragraph(title, self.h1))
         self._spacer()
 
     def paragraph(self, text):
-        self.contents.append(Paragraph(text, self.body))
-        self._spacer()
+        # Line breaks preserved if required
+        text_elements = text.splitlines()
+        for t in text_elements:
+            self.contents.append(Paragraph(t, self.body))
+            self._spacer()
 
     def _notes_paragraph(self, text):
         self.contents.append(Paragraph(text, self.list))
@@ -153,7 +162,7 @@ class PDFBuilder(DocBuilder):
             notes = ["<br/><u>Notes</u><br/><ul>"]
             i = 1
             for d in self.note_data:
-                notes.append(f"<li>{str(i)} . {d}</li>")
+                notes.append(f"<li>{-str(i):>4} . {d}</li>")
                 i += 1
             self._notes_paragraph("</ul><br/>".join(notes))
             self.note_data = []

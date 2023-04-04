@@ -10,7 +10,7 @@ class MarkdownBuilder(DocBuilder):
     def __init__(self):
         self.markdown_document = []
 
-    def heading(self, level, title):
+    def heading(self, level, title, number=True):
         heading_field = "#" * level
         self.markdown_document.append(f"\n{heading_field} {title}\n")
 

@@ -13,7 +13,7 @@ class ConsoleBuilder(DocBuilder):
     def __init__(self):
         pass
 
-    def heading(self, level, title):
+    def heading(self, level, title, number=True):
         print(Panel(title, style="bold", expand=False))
 
     def paragraph(self, text):

@@ -6,7 +6,7 @@ class DocBuilder:
     def __init__(self):
         pass
 
-    def heading(self, level, title):
+    def heading(self, level, title, number=True):
         pass
 
     def paragraph(self, text):
@@ -22,4 +22,7 @@ class DocBuilder:
         pass
 
     def publish(self, filename):
+        pass
+
+    def pagebreak(self):
         pass

@@ -1,14 +1,16 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import requests
 from lib4sbom.data.document import SBOMDocument
+from lib4sbom.license import LicenseScanner
 
 from sbom2doc.docbuilder.consolebuilder import ConsoleBuilder
 from sbom2doc.docbuilder.markdownbuilder import MarkdownBuilder
 from sbom2doc.docbuilder.pdfbuilder import PDFBuilder
 
 
-def generate_document(format, sbom_parser, filename, outfile):
+def generate_document(format, sbom_parser, filename, outfile, include_license):
     # Get constituent components of the SBOM
     packages = sbom_parser.get_packages()
     files = sbom_parser.get_files()
@@ -73,7 +75,7 @@ def generate_document(format, sbom_parser, filename, outfile):
 
         sbom_document.heading(1, "Package Summary")
         sbom_document.createtable(
-            ["Name", "Version", "Supplier", "License"], [None, 8, 8, None]
+            ["Name", "Version", "Supplier", "License"], [12, 8, 8, 12]
         )
         for package in packages:
             # Minimum elements are ID, Name, Version, Supplier
@@ -95,8 +97,10 @@ def generate_document(format, sbom_parser, filename, outfile):
         sbom_document.showtable(widths=[5, 2, 2, 5])
 
         # Too much information so second table required
+        sbom_document.paragraph("")
         sbom_document.createtable(
-            ["Name", "Version", "Download", "Copyright"], [None, 8, 10, 10])
+            ["Name", "Version", "Download", "Copyright"], [12, 8, 10, 10]
+        )
         for package in packages:
             name = package.get("name", None)
             version = package.get("version", None)
@@ -106,7 +110,7 @@ def generate_document(format, sbom_parser, filename, outfile):
         sbom_document.showtable(widths=[5, 2, 4, 3])
 
     sbom_document.heading(1, "License Summary")
-    sbom_document.createtable(["License", "Count"])
+    sbom_document.createtable(["License", "Count"], [25, 6])
     #
     # Create an empty dictionary
     freq = {}
@@ -135,4 +139,22 @@ def generate_document(format, sbom_parser, filename, outfile):
         and relationships_valid
     )
     sbom_document.paragraph(f"NTIA conformant {valid_sbom}")
+
+    if include_license:
+        sbom_document.pagebreak()
+        sbom_document.heading(1, "License Text")
+        license_info = LicenseScanner()
+        for key, value in freq.items():
+            # Ignore undefined licenses or expressions
+            if key == "NOASSERTION" or license_info.license_expression(key):
+                continue
+            license_url = f"https://spdx.org/licenses/{key}.json"
+            try:
+                license_text = requests.get(license_url).json()
+                if license_text.get("licenseText") is not None:
+                    sbom_document.heading(2, key, number=False)
+                    sbom_document.paragraph(license_text["licenseText"])
+            except:
+                pass
+
     sbom_document.publish(outfile)
