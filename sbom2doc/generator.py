@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import requests
+from packageurl import PackageURL
+
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.license import LicenseScanner
 
@@ -99,15 +101,26 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
         # Too much information so second table required
         sbom_document.paragraph("")
         sbom_document.createtable(
-            ["Name", "Version", "Download", "Copyright"], [12, 8, 10, 10]
+            ["Name", "Version", "Ecosystem", "Download", "Copyright"], [12, 8, 5, 8, 7]
         )
         for package in packages:
             name = package.get("name", None)
             version = package.get("version", None)
+            external_info = package.get("externalreference", None)
+            ecosystem = "-"
+            if external_info is not None:
+                for reference in external_info:
+                    if reference[1] == "purl":
+                        try:
+                            purl = PackageURL.from_string(reference[2]).to_dict()
+                            ecosystem = purl["type"]
+                        except ValueError:
+                            ecosystem = "INVALID"
+                        break
             download = package.get("downloadlocation", "NOT KNOWN")
             copyright = package.get("copyrighttext", "-")
-            sbom_document.addrow([name, version, download, copyright])
-        sbom_document.showtable(widths=[5, 2, 4, 3])
+            sbom_document.addrow([name, version, ecosystem, download, copyright])
+        sbom_document.showtable(widths=[5, 2, 2, 2, 2])
 
     sbom_document.heading(1, "License Summary")
     sbom_document.createtable(["License", "Count"], [25, 6])
