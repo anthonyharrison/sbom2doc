@@ -2,10 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import requests
-from packageurl import PackageURL
-
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.license import LicenseScanner
+from packageurl import PackageURL
 
 from sbom2doc.docbuilder.consolebuilder import ConsoleBuilder
 from sbom2doc.docbuilder.markdownbuilder import MarkdownBuilder
@@ -167,7 +166,8 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
                 if license_text.get("licenseText") is not None:
                     sbom_document.heading(2, key, number=False)
                     sbom_document.paragraph(license_text["licenseText"])
-            except:
-                pass
+            except requests.exceptions.RequestException:
+                sbom_document.heading(2, key, number=False)
+                sbom_document.paragraph("Unable to find license text.")
 
     sbom_document.publish(outfile)
