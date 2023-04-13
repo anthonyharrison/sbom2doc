@@ -162,7 +162,7 @@ class PDFBuilder(DocBuilder):
             notes = ["<br/><u>Notes</u><br/><ul>"]
             i = 1
             for d in self.note_data:
-                notes.append(f"<li>{-str(i):>4} . {d}</li>")
+                notes.append(f"<li>{str(i):>4} . {d}</li>")
                 i += 1
             self._notes_paragraph("</ul><br/>".join(notes))
             self.note_data = []
