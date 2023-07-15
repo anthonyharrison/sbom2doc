@@ -18,6 +18,7 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     relationships = sbom_parser.get_relationships()
     document = SBOMDocument()
     document.copy_document(sbom_parser.get_document())
+    license_info = LicenseScanner()
 
     # Select document builder based on format
     if format == "markdown":
@@ -85,6 +86,8 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
             version = package.get("version", None)
             supplier = package.get("supplier", None)
             license = package.get("licenseconcluded", "NOT KNOWN")
+            if license != "NOT KNOWN" and license_info.deprecated(license):
+                license = f"{license} (Deprecated)"
             sbom_licenses.append(license)
             sbom_document.addrow([name, version, supplier, license])
             if (
@@ -155,7 +158,6 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     if include_license:
         sbom_document.pagebreak()
         sbom_document.heading(1, "License Text")
-        license_info = LicenseScanner()
         for key, value in freq.items():
             # Ignore undefined licenses or expressions
             if key == "NOASSERTION" or license_info.license_expression(key):
