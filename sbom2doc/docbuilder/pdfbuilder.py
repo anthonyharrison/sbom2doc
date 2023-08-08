@@ -135,7 +135,9 @@ class PDFBuilder(DocBuilder):
         for d in data:
             if self.table_validation[i] is not None:
                 # Column size validation
-                if len(d) > self.table_validation[i]:
+                if d is None:
+                    newdata.append("")
+                elif len(d) > self.table_validation[i]:
                     if d not in self.note_data:
                         self.note_data.append(d)
                     newdata.append("Note " + str(self.note_data.index(d) + 1))

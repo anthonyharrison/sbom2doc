@@ -26,7 +26,13 @@ class MarkdownBuilder(DocBuilder):
 
     def addrow(self, data):
         # Add row to table
-        table_row = " | ".join(d for d in data)
+        my_data = []
+        for d in data:
+            if d is not None:
+                my_data.append(d)
+            else:
+                my_data.append("")
+        table_row = " | ".join(d for d in my_data)
         self.markdown_document.append(table_row)
 
     def publish(self, filename):
