@@ -29,7 +29,7 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
         sbom_document = ConsoleBuilder()
 
     sbom_document.heading(1, "SBOM Summary")
-    sbom_document.createtable(["Item", "Details"])
+    sbom_document.createtable(["Item", "Details"], [20, 35])
     sbom_document.addrow(["SBOM File", filename])
     sbom_document.addrow(["SBOM Type", document.get_type()])
     sbom_document.addrow(["Version", document.get_version()])
