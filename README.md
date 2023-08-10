@@ -21,7 +21,9 @@ up for testing using different versions of Python.
 ## Usage
 
 ```
-usage: sbom2doc [-h] [-i INPUT_FILE] [--debug] [--include-license] [-f {console,markdown,pdf}] [-o OUTPUT_FILE] [-V]
+usage: sbom2doc [-h] [-i INPUT_FILE] [--debug] [--include-license] [-f {console,json,markdown,pdf}] [-o OUTPUT_FILE] [-V]
+
+SBOM2doc generates documentation for a SBOM.
 
 options:
   -h, --help            show this help message and exit
@@ -34,10 +36,11 @@ Input:
 Output:
   --debug               add debug information
   --include-license     add license text
-  -f {console,markdown,pdf}, --format {console,markdown,pdf}
+  -f {console,json,markdown,pdf}, --format {console,json,markdown,pdf}
                         Output format (default: output to console)
   -o OUTPUT_FILE, --output-file OUTPUT_FILE
                         output filename (default: output to stdout)
+
 ```
 					
 ## Operation

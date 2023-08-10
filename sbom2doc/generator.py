@@ -7,6 +7,7 @@ from lib4sbom.license import LicenseScanner
 from packageurl import PackageURL
 
 from sbom2doc.docbuilder.consolebuilder import ConsoleBuilder
+from sbom2doc.docbuilder.jsonbuilder import JSONBuilder
 from sbom2doc.docbuilder.markdownbuilder import MarkdownBuilder
 from sbom2doc.docbuilder.pdfbuilder import PDFBuilder
 
@@ -23,6 +24,8 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     # Select document builder based on format
     if format == "markdown":
         sbom_document = MarkdownBuilder()
+    elif format == "json":
+        sbom_document = JSONBuilder()
     elif format == "pdf":
         sbom_document = PDFBuilder()
     else:

@@ -56,7 +56,7 @@ def main(argv=None):
         "--format",
         action="store",
         help="Output format (default: output to console)",
-        choices=["console", "markdown", "pdf"],
+        choices=["console", "json", "markdown", "pdf"],
         default="console",
     )
 
