@@ -13,9 +13,12 @@ class JSONBuilder(DocBuilder):
         self.element_data=[]
         self.attribute_headings = []
 
+    def _attribute(self, name):
+        return name.lower().replace(" ","_")
+
     def heading(self, level, title, number=True):
         if self.element[level-1] != "":
-            self.json_document[self.element[level-1]] = self.element_data
+            self.json_document[self._attribute(self.element[level-1])] = self.element_data
         self.element[level-1] = title
         self.element_data = []
 
@@ -28,10 +31,11 @@ class JSONBuilder(DocBuilder):
         my_data = {}
         index = 0
         for d in data:
+            element = self._attribute(self.attribute_headings[index])
             if d is not None:
-                my_data[self.attribute_headings[index]] = d
+                my_data[element] = d
             else:
-                my_data[self.attribute_headings[index]] = ""
+                my_data[element] = ""
             index = index + 1
         self.element_data.append(my_data)
 
