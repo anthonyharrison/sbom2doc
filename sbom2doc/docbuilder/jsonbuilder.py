@@ -9,17 +9,19 @@ from sbom2doc.docbuilder.docbuilder import DocBuilder
 class JSONBuilder(DocBuilder):
     def __init__(self):
         self.json_document = {}
-        self.element=["",""]
-        self.element_data=[]
+        self.element = ["", ""]
+        self.element_data = []
         self.attribute_headings = []
 
     def _attribute(self, name):
-        return name.lower().replace(" ","_")
+        return name.lower().replace(" ", "_")
 
     def heading(self, level, title, number=True):
-        if self.element[level-1] != "":
-            self.json_document[self._attribute(self.element[level-1])] = self.element_data
-        self.element[level-1] = title
+        if self.element[level - 1] != "":
+            self.json_document[
+                self._attribute(self.element[level - 1])
+            ] = self.element_data
+        self.element[level - 1] = title
         self.element_data = []
 
     def createtable(self, header, validate=None):
@@ -41,6 +43,6 @@ class JSONBuilder(DocBuilder):
 
     def publish(self, filename):
         # Force last set of data to be added to document
-        self.heading(1,"dummy")
+        self.heading(1, "dummy")
         json_doc = SBOMOutput(filename=filename, output_format="json")
         json_doc.generate_output(self.json_document)
