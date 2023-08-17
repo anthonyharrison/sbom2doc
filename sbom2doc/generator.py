@@ -55,6 +55,7 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     packages_valid = True
     relationships_valid = len(relationships) > 0
     sbom_licenses = []
+    sbom_components = []
     if len(files) > 0:
 
         sbom_document.heading(1, "File Summary")
@@ -80,19 +81,21 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
 
         sbom_document.heading(1, "Package Summary")
         sbom_document.createtable(
-            ["Name", "Version", "Supplier", "License"], [12, 8, 8, 12]
+            ["Name", "Version", "Type", "Supplier", "License"], [12, 8, 8, 8, 12]
         )
         for package in packages:
             # Minimum elements are ID, Name, Version, Supplier
             id = package.get("id", None)
             name = package.get("name", None)
             version = package.get("version", None)
+            type = package.get("type", None)
             supplier = package.get("supplier", None)
             license = package.get("licenseconcluded", "NOT KNOWN")
             if license != "NOT KNOWN" and license_info.deprecated(license):
                 license = f"{license} (Deprecated)"
             sbom_licenses.append(license)
-            sbom_document.addrow([name, version, supplier, license])
+            sbom_components.append(type)
+            sbom_document.addrow([name, version, type, supplier, license])
             if (
                 id is None
                 or name is None
@@ -126,6 +129,17 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
             copyright = package.get("copyrighttext", "-")
             sbom_document.addrow([name, version, ecosystem, download, copyright])
         sbom_document.showtable(widths=[5, 2, 2, 2, 2])
+
+    sbom_document.heading(1, "Component Type Summary")
+    sbom_document.createtable(["Type", "Count"], [25, 6])
+    #
+    # Create an empty dictionary
+    freq = {}
+    for items in sorted(sbom_components):
+        freq[items] = sbom_components.count(items)
+    for key, value in freq.items():
+        sbom_document.addrow([key, str(value)])
+    sbom_document.showtable(widths=[10, 4])
 
     sbom_document.heading(1, "License Summary")
     sbom_document.createtable(["License", "Count"], [25, 6])
