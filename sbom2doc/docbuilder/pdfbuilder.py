@@ -94,15 +94,20 @@ class PDFBuilder(DocBuilder):
         self._spacer()
         if level == 1:
             self.headingnumber[level] += 1
-            self.headingnumber[level + 1] = 1
+            self.headingnumber[level + 1] = 0
         elif level == 2:
             self.headingnumber[level] += 1
         elif level > 2:
             print("Ooops.... Level", level)
         if number:
-            self.contents.append(
-                Paragraph(str(self.headingnumber[level]) + ". " + title, self.h1)
-            )
+            if level == 1:
+                self.contents.append(
+                    Paragraph(str(self.headingnumber[level]) + ". " + title, self.h1)
+                )
+            else:
+                self.contents.append(
+                    Paragraph(str(self.headingnumber[level-1]) + "." + str(self.headingnumber[level]) + ". " + title, self.h1)
+                )
         else:
             self.contents.append(Paragraph(title, self.h1))
         self._spacer()
