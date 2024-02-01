@@ -56,6 +56,7 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     relationships_valid = len(relationships) > 0
     sbom_licenses = []
     sbom_components = []
+    sbom_suppliers = []
     if len(files) > 0:
 
         sbom_document.heading(1, "File Summary")
@@ -95,6 +96,8 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
                 license = f"{license} (Deprecated)"
             sbom_licenses.append(license)
             sbom_components.append(type)
+            if supplier is not None:
+                sbom_suppliers.append(supplier)
             sbom_document.addrow([name, version, type, supplier, license])
             if (
                 id is None
@@ -148,6 +151,17 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     freq = {}
     for items in sorted(sbom_licenses):
         freq[items] = sbom_licenses.count(items)
+    for key, value in freq.items():
+        sbom_document.addrow([key, str(value)])
+    sbom_document.showtable(widths=[10, 4])
+
+    sbom_document.heading(1, "Supplier Summary")
+    sbom_document.createtable(["Supplier", "Count"], [25, 6])
+    #
+    # Create an empty dictionary
+    freq = {}
+    for items in sorted(sbom_suppliers):
+        freq[items] = sbom_suppliers.count(items)
     for key, value in freq.items():
         sbom_document.addrow([key, str(value)])
     sbom_document.showtable(widths=[10, 4])
