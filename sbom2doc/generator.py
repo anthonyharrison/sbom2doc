@@ -17,6 +17,8 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     packages = sbom_parser.get_packages()
     files = sbom_parser.get_files()
     relationships = sbom_parser.get_relationships()
+    services = sbom_parser.get_services()
+    vulnerabilities = sbom_parser.get_vulnerabilities()
     document = SBOMDocument()
     document.copy_document(sbom_parser.get_document())
     license_info = LicenseScanner()
@@ -185,6 +187,29 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
         and relationships_valid
     )
     sbom_document.paragraph(f"NTIA conformant {valid_sbom}")
+
+    if len(services) > 0:
+        sbom_document.heading(1, "Services Summary")
+        sbom_document.createtable(["Name", "Type", "License", "Copyright"])
+        for service in services:
+            id = file.get("id", None)
+            name = file.get("name", None)
+            filetype = file.get("filetype", None)
+            if filetype is not None:
+                file_type = ", ".join(t for t in filetype)
+            else:
+                file_type = "NOT KNOWN"
+            license = file.get("licenseconcluded", "NOT KNOWN")
+            copyright = file.get("copyrighttext", "-")
+            sbom_licenses.append(license)
+            sbom_document.addrow([name, file_type, license, copyright])
+        sbom_document.showtable(widths=[3, 2, 4, 5])
+
+    if len(vulnerabilities) > 0:
+        sbom_document.heading(1, "Vulnerabilities Summary")
+        sbom_document.createtable(["Name", "Id", "Status", "Copyright"])
+        for vulnerability in vulnerabilities:
+            pass
 
     if include_license:
         sbom_document.pagebreak()
