@@ -150,10 +150,10 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     sbom_document.createtable(["License", "Count"], [25, 6])
     #
     # Create an empty dictionary
-    freq = {}
+    freq_licences = {}
     for items in sorted(sbom_licenses):
-        freq[items] = sbom_licenses.count(items)
-    for key, value in freq.items():
+        freq_licences[items] = sbom_licenses.count(items)
+    for key, value in freq_licences.items():
         sbom_document.addrow([key, str(value)])
     sbom_document.showtable(widths=[10, 4])
 
@@ -161,10 +161,10 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     sbom_document.createtable(["Supplier", "Count"], [25, 6])
     #
     # Create an empty dictionary
-    freq = {}
+    freq_suppliers = {}
     for items in sorted(sbom_suppliers):
-        freq[items] = sbom_suppliers.count(items)
-    for key, value in freq.items():
+        freq_suppliers[items] = sbom_suppliers.count(items)
+    for key, value in freq_suppliers.items():
         sbom_document.addrow([key, str(value)])
     sbom_document.showtable(widths=[10, 4])
 
@@ -214,7 +214,7 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     if include_license:
         sbom_document.pagebreak()
         sbom_document.heading(1, "License Text")
-        for key, value in freq.items():
+        for key, value in freq_licences.items():
             # Ignore undefined licenses or expressions
             if key == "NOASSERTION" or license_info.license_expression(key):
                 continue
