@@ -50,6 +50,8 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     sbom_document.addrow(["Files", str(len(files))])
     sbom_document.addrow(["Packages", str(len(packages))])
     sbom_document.addrow(["Relationships", str(len(relationships))])
+    sbom_document.addrow(["Services", str(len(services))])
+    sbom_document.addrow(["Vulnerabilities", str(len(vulnerabilities))])
     sbom_document.showtable(widths=[5, 9])
     creation_time = document.get_created() is not None
 
@@ -59,8 +61,9 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     sbom_licenses = []
     sbom_components = []
     sbom_suppliers = []
+    # Create an empty dictionary
+    freq_licences = {}
     if len(files) > 0:
-
         sbom_document.heading(1, "File Summary")
         sbom_document.createtable(["Name", "Type", "License", "Copyright"])
         for file in files:
@@ -81,7 +84,6 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
         sbom_document.showtable(widths=[3, 2, 4, 5])
 
     if len(packages) > 0:
-
         sbom_document.heading(1, "Package Summary")
         sbom_document.createtable(
             ["Name", "Version", "Type", "Supplier", "License"], [12, 8, 8, 8, 12]
@@ -135,38 +137,36 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
             sbom_document.addrow([name, version, ecosystem, download, copyright])
         sbom_document.showtable(widths=[5, 2, 2, 2, 2])
 
-    sbom_document.heading(1, "Component Type Summary")
-    sbom_document.createtable(["Type", "Count"], [25, 6])
-    #
-    # Create an empty dictionary
-    freq = {}
-    for items in sorted(sbom_components):
-        freq[items] = sbom_components.count(items)
-    for key, value in freq.items():
-        sbom_document.addrow([key, str(value)])
-    sbom_document.showtable(widths=[10, 4])
+        sbom_document.heading(1, "Component Type Summary")
+        sbom_document.createtable(["Type", "Count"], [25, 6])
+        #
+        # Create an empty dictionary
+        freq = {}
+        for items in sorted(sbom_components):
+            freq[items] = sbom_components.count(items)
+        for key, value in freq.items():
+            sbom_document.addrow([key, str(value)])
+        sbom_document.showtable(widths=[10, 4])
 
-    sbom_document.heading(1, "License Summary")
-    sbom_document.createtable(["License", "Count"], [25, 6])
-    #
-    # Create an empty dictionary
-    freq_licences = {}
-    for items in sorted(sbom_licenses):
-        freq_licences[items] = sbom_licenses.count(items)
-    for key, value in freq_licences.items():
-        sbom_document.addrow([key, str(value)])
-    sbom_document.showtable(widths=[10, 4])
+        sbom_document.heading(1, "License Summary")
+        sbom_document.createtable(["License", "Count"], [25, 6])
+        #
+        for items in sorted(sbom_licenses):
+            freq_licences[items] = sbom_licenses.count(items)
+        for key, value in freq_licences.items():
+            sbom_document.addrow([key, str(value)])
+        sbom_document.showtable(widths=[10, 4])
 
-    sbom_document.heading(1, "Supplier Summary")
-    sbom_document.createtable(["Supplier", "Count"], [25, 6])
-    #
-    # Create an empty dictionary
-    freq_suppliers = {}
-    for items in sorted(sbom_suppliers):
-        freq_suppliers[items] = sbom_suppliers.count(items)
-    for key, value in freq_suppliers.items():
-        sbom_document.addrow([key, str(value)])
-    sbom_document.showtable(widths=[10, 4])
+        sbom_document.heading(1, "Supplier Summary")
+        sbom_document.createtable(["Supplier", "Count"], [25, 6])
+        #
+        # Create an empty dictionary
+        freq_suppliers = {}
+        for items in sorted(sbom_suppliers):
+            freq_suppliers[items] = sbom_suppliers.count(items)
+        for key, value in freq_suppliers.items():
+            sbom_document.addrow([key, str(value)])
+        sbom_document.showtable(widths=[10, 4])
 
     sbom_document.heading(1, "NTIA Summary")
     sbom_document.createtable(["Element", "Status"])
@@ -190,19 +190,17 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
 
     if len(services) > 0:
         sbom_document.heading(1, "Services Summary")
-        sbom_document.createtable(["Name", "Type", "License", "Copyright"])
+        sbom_document.createtable(["Name", "Description", "Authenticated", "Data"])
         for service in services:
-            id = file.get("id", None)
-            name = file.get("name", None)
-            filetype = file.get("filetype", None)
-            if filetype is not None:
-                file_type = ", ".join(t for t in filetype)
+            id = service.get("id", None)
+            name = service.get("name", "")
+            description = service.get("description", "")
+            if service.get("authenticated") is None:
+                authenticated = "Not defined"
             else:
-                file_type = "NOT KNOWN"
-            license = file.get("licenseconcluded", "NOT KNOWN")
-            copyright = file.get("copyrighttext", "-")
-            sbom_licenses.append(license)
-            sbom_document.addrow([name, file_type, license, copyright])
+                authenticated = str(service.get("authenticated"))
+            # dataitems = service.get("data", "")
+            sbom_document.addrow([name, description, authenticated, ""])
         sbom_document.showtable(widths=[3, 2, 4, 5])
 
     if len(vulnerabilities) > 0:
@@ -211,7 +209,7 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
         for vulnerability in vulnerabilities:
             pass
 
-    if include_license:
+    if include_license and len(freq_licences) > 0:
         sbom_document.pagebreak()
         sbom_document.heading(1, "License Text")
         for key, value in freq_licences.items():

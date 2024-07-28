@@ -15,7 +15,6 @@ from sbom2doc.version import VERSION
 
 
 def main(argv=None):
-
     argv = argv or sys.argv
     app_name = "sbom2doc"
     parser = argparse.ArgumentParser(
