@@ -10,6 +10,7 @@ from sbom2doc.docbuilder.consolebuilder import ConsoleBuilder
 from sbom2doc.docbuilder.jsonbuilder import JSONBuilder
 from sbom2doc.docbuilder.markdownbuilder import MarkdownBuilder
 from sbom2doc.docbuilder.pdfbuilder import PDFBuilder
+from sbom2doc.docbuilder.spreadsheetbuilder import SpreadsheetBuilder
 
 
 def generate_document(format, sbom_parser, filename, outfile, include_license):
@@ -30,6 +31,8 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
         sbom_document = JSONBuilder()
     elif format == "pdf":
         sbom_document = PDFBuilder()
+    elif format == "excel":
+        sbom_document = SpreadsheetBuilder()
     else:
         sbom_document = ConsoleBuilder()
 

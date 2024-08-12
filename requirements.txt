@@ -3,3 +3,4 @@ rich
 reportlab
 packageurl-python
 requests
+openpyxl
