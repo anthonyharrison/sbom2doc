@@ -106,7 +106,14 @@ class PDFBuilder(DocBuilder):
                 )
             else:
                 self.contents.append(
-                    Paragraph(str(self.headingnumber[level-1]) + "." + str(self.headingnumber[level]) + ". " + title, self.h1)
+                    Paragraph(
+                        str(self.headingnumber[level - 1])
+                        + "."
+                        + str(self.headingnumber[level])
+                        + ". "
+                        + title,
+                        self.h1,
+                    )
                 )
         else:
             self.contents.append(Paragraph(title, self.h1))

@@ -18,9 +18,9 @@ class JSONBuilder(DocBuilder):
 
     def heading(self, level, title, number=True):
         if self.element[level - 1] != "":
-            self.json_document[
-                self._attribute(self.element[level - 1])
-            ] = self.element_data
+            self.json_document[self._attribute(self.element[level - 1])] = (
+                self.element_data
+            )
         self.element[level - 1] = title
         self.element_data = []
 
