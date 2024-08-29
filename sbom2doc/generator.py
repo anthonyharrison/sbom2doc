@@ -11,6 +11,7 @@ from sbom2doc.docbuilder.jsonbuilder import JSONBuilder
 from sbom2doc.docbuilder.markdownbuilder import MarkdownBuilder
 from sbom2doc.docbuilder.pdfbuilder import PDFBuilder
 from sbom2doc.docbuilder.spreadsheetbuilder import SpreadsheetBuilder
+from sbom2doc.docbuilder.htmlbuilder import HTMLBuilder
 
 
 def generate_document(format, sbom_parser, filename, outfile, include_license):
@@ -33,6 +34,8 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
         sbom_document = PDFBuilder()
     elif format == "excel":
         sbom_document = SpreadsheetBuilder()
+    elif format == "html":
+        sbom_document = HTMLBuilder()
     else:
         sbom_document = ConsoleBuilder()
 
@@ -139,6 +142,29 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
             copyright = package.get("copyrighttext", "-")
             sbom_document.addrow([name, version, ecosystem, download, copyright])
         sbom_document.showtable(widths=[5, 2, 2, 2, 2])
+
+        # Show Purl and CPE information
+        sbom_document.paragraph("")
+        sbom_document.createtable(
+            ["Name", "PURL", "CPE"], [12, 12, 15]
+        )
+        for package in packages:
+            name = package.get("name", None)
+            purl = cpe = ""
+            external_info = package.get("externalreference", None)
+            if external_info is not None:
+                for reference in external_info:
+                    if reference[1] == "purl":
+                        try:
+                            purl = reference[2]
+                        except ValueError:
+                            purl = ""
+                    elif reference[1] in ["cpe22Type", "cpe23Type"]:
+                        cpe = reference[2]
+
+            sbom_document.addrow([name, purl, cpe])
+        sbom_document.showtable(widths=[5, 2, 2, 2, 2])
+
 
         sbom_document.heading(1, "Component Type Summary")
         sbom_document.createtable(["Type", "Count"], [25, 6])
