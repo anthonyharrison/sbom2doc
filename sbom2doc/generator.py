@@ -145,26 +145,42 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
 
         # Show Purl and CPE information
         sbom_document.paragraph("")
-        sbom_document.createtable(
-            ["Name", "PURL", "CPE"], [12, 12, 15]
-        )
+        sbom_document.createtable(["Name", "PURL"], [12, 12])
         for package in packages:
             name = package.get("name", None)
-            purl = cpe = ""
+            purl = ""
             external_info = package.get("externalreference", None)
+            at_least_one_found = False
             if external_info is not None:
                 for reference in external_info:
                     if reference[1] == "purl":
                         try:
                             purl = reference[2]
+                            at_least_one_found = True
+                            sbom_document.addrow([name, purl])
                         except ValueError:
                             purl = ""
-                    elif reference[1] in ["cpe22Type", "cpe23Type"]:
+            if not at_least_one_found:
+                sbom_document.addrow([name, purl])
+        sbom_document.showtable(widths=[5, 2])
+
+        sbom_document.paragraph("")
+        sbom_document.createtable(["Name", "CPE"], [12, 12])
+        for package in packages:
+            name = package.get("name", None)
+            cpe = ""
+            external_info = package.get("externalreference", None)
+            at_least_one_found = False
+            if external_info is not None:
+                for reference in external_info:
+                    if reference[1] in ["cpe22Type", "cpe23Type"]:
                         cpe = reference[2]
+                        at_least_one_found = True
+                        sbom_document.addrow([name, cpe])
 
-            sbom_document.addrow([name, purl, cpe])
-        sbom_document.showtable(widths=[5, 2, 2, 2, 2])
-
+            if not at_least_one_found:
+                sbom_document.addrow([name, cpe])
+        sbom_document.showtable(widths=[5, 2])
 
         sbom_document.heading(1, "Component Type Summary")
         sbom_document.createtable(["Type", "Count"], [25, 6])
