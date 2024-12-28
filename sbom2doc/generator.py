@@ -92,7 +92,7 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     if len(packages) > 0:
         sbom_document.heading(1, "Package Summary")
         sbom_document.createtable(
-            ["Name", "Version", "Type", "Supplier", "License"], [12, 8, 8, 8, 12]
+            ["Name", "Version", "PURL", "CPE", "Type", "Supplier", "License", "Ecosystem", "Download", "Copyright"], [12, 8, 8, 8, 12]
         )
         for package in packages:
             # Minimum elements are ID, Name, Version, Supplier
@@ -108,7 +108,26 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
             sbom_components.append(type)
             if supplier is not None:
                 sbom_suppliers.append(supplier)
-            sbom_document.addrow([name, version, type, supplier, license])
+            external_info = package.get("externalreference", None)
+            ecosystem = "-"
+            purl = cpe = ""
+            if external_info is not None:
+                for reference in external_info:
+                    if reference[1] == "purl":
+                        try:
+                            purl = PackageURL.from_string(reference[2]).to_dict()
+                            ecosystem = purl["type"]
+                        except ValueError:
+                            ecosystem = "INVALID"
+                        try:
+                            purl = reference[2]
+                        except ValueError:
+                            purl = ""
+                    elif reference[1] in ["cpe22Type", "cpe23Type"]:
+                        cpe = reference[2]
+            download = package.get("downloadlocation", "NOT KNOWN")
+            copyright = package.get("copyrighttext", "-")
+            sbom_document.addrow([name, version, purl, cpe, type, supplier, license, ecosystem, download, copyright])
             if (
                 id is None
                 or name is None
@@ -118,53 +137,6 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
             ):
                 packages_valid = False
         sbom_document.showtable(widths=[5, 2, 2, 5])
-
-        # Too much information so second table required
-        sbom_document.paragraph("")
-        sbom_document.createtable(
-            ["Name", "Version", "Ecosystem", "Download", "Copyright"], [12, 8, 5, 8, 7]
-        )
-        for package in packages:
-            name = package.get("name", None)
-            version = package.get("version", None)
-            external_info = package.get("externalreference", None)
-            ecosystem = "-"
-            if external_info is not None:
-                for reference in external_info:
-                    if reference[1] == "purl":
-                        try:
-                            purl = PackageURL.from_string(reference[2]).to_dict()
-                            ecosystem = purl["type"]
-                        except ValueError:
-                            ecosystem = "INVALID"
-                        break
-            download = package.get("downloadlocation", "NOT KNOWN")
-            copyright = package.get("copyrighttext", "-")
-            sbom_document.addrow([name, version, ecosystem, download, copyright])
-        sbom_document.showtable(widths=[5, 2, 2, 2, 2])
-
-        # Show Purl and CPE information
-        sbom_document.paragraph("")
-        sbom_document.createtable(
-            ["Name", "PURL", "CPE"], [12, 12, 15]
-        )
-        for package in packages:
-            name = package.get("name", None)
-            purl = cpe = ""
-            external_info = package.get("externalreference", None)
-            if external_info is not None:
-                for reference in external_info:
-                    if reference[1] == "purl":
-                        try:
-                            purl = reference[2]
-                        except ValueError:
-                            purl = ""
-                    elif reference[1] in ["cpe22Type", "cpe23Type"]:
-                        cpe = reference[2]
-
-            sbom_document.addrow([name, purl, cpe])
-        sbom_document.showtable(widths=[5, 2, 2, 2, 2])
-
 
         sbom_document.heading(1, "Component Type Summary")
         sbom_document.createtable(["Type", "Count"], [25, 6])
@@ -186,16 +158,17 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
             sbom_document.addrow([key, str(value)])
         sbom_document.showtable(widths=[10, 4])
 
-        sbom_document.heading(1, "Supplier Summary")
-        sbom_document.createtable(["Supplier", "Count"], [25, 6])
-        #
-        # Create an empty dictionary
-        freq_suppliers = {}
-        for items in sorted(sbom_suppliers):
-            freq_suppliers[items] = sbom_suppliers.count(items)
-        for key, value in freq_suppliers.items():
-            sbom_document.addrow([key, str(value)])
-        sbom_document.showtable(widths=[10, 4])
+        if len(sbom_suppliers) > 0:
+            sbom_document.heading(1, "Supplier Summary")
+            sbom_document.createtable(["Supplier", "Count"], [25, 6])
+            #
+            # Create an empty dictionary
+            freq_suppliers = {}
+            for items in sorted(sbom_suppliers):
+                freq_suppliers[items] = sbom_suppliers.count(items)
+            for key, value in freq_suppliers.items():
+                sbom_document.addrow([key, str(value)])
+            sbom_document.showtable(widths=[10, 4])
 
     sbom_document.heading(1, "NTIA Summary")
     sbom_document.createtable(["Element", "Status"])
@@ -234,9 +207,13 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
 
     if len(vulnerabilities) > 0:
         sbom_document.heading(1, "Vulnerabilities Summary")
-        sbom_document.createtable(["Name", "Id", "Status", "Copyright"])
+        sbom_document.createtable(["Id", "Source", "Status" ])
         for vulnerability in vulnerabilities:
-            pass
+            id = vulnerability["id"]
+            status = vulnerability.get("status","-")
+            source = vulnerability.get("source","-")
+            sbom_document.addrow([id, source, status])
+        sbom_document.showtable(widths=[3, 2, 4, 5])
 
     if include_license and len(freq_licences) > 0:
         sbom_document.pagebreak()
