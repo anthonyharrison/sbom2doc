@@ -1,4 +1,4 @@
-lib4sbom >= 0.7.2
+lib4sbom >= 0.8.1
 rich
 reportlab
 packageurl-python
