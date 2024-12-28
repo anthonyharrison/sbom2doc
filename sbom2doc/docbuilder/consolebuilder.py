@@ -26,20 +26,7 @@ class ConsoleBuilder(DocBuilder):
             self.table.add_column(h)
 
     def addrow(self, data):
-        if len(data) > 5:
-            print("Ooops - too much data!")
-        else:
-            # Add row to table
-            if len(data) == 1:
-                self.table.add_row(data[0])
-            elif len(data) == 2:
-                self.table.add_row(data[0], data[1])
-            elif len(data) == 3:
-                self.table.add_row(data[0], data[1], data[2])
-            elif len(data) == 4:
-                self.table.add_row(data[0], data[1], data[2], data[3])
-            else:
-                self.table.add_row(data[0], data[1], data[2], data[3], data[4])
+        self.table.add_row(*data)
 
     def showtable(self, widths=None):
         console = Console()
