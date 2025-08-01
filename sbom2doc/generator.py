@@ -7,11 +7,11 @@ from lib4sbom.license import LicenseScanner
 from packageurl import PackageURL
 
 from sbom2doc.docbuilder.consolebuilder import ConsoleBuilder
+from sbom2doc.docbuilder.htmlbuilder import HTMLBuilder
 from sbom2doc.docbuilder.jsonbuilder import JSONBuilder
 from sbom2doc.docbuilder.markdownbuilder import MarkdownBuilder
 from sbom2doc.docbuilder.pdfbuilder import PDFBuilder
 from sbom2doc.docbuilder.spreadsheetbuilder import SpreadsheetBuilder
-from sbom2doc.docbuilder.htmlbuilder import HTMLBuilder
 
 
 def generate_document(format, sbom_parser, filename, outfile, include_license):
@@ -92,7 +92,19 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
     if len(packages) > 0:
         sbom_document.heading(1, "Package Summary")
         sbom_document.createtable(
-            ["Name", "Version", "PURL", "CPE", "Type", "Supplier", "License", "Ecosystem", "Download", "Copyright"], [12, 8, 8, 8, 12]
+            [
+                "Name",
+                "Version",
+                "PURL",
+                "CPE",
+                "Type",
+                "Supplier",
+                "License",
+                "Ecosystem",
+                "Download",
+                "Copyright",
+            ],
+            [12, 8, 8, 8, 12],
         )
         for package in packages:
             # Minimum elements are ID, Name, Version, Supplier
@@ -127,7 +139,20 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
                         cpe = reference[2]
             download = package.get("downloadlocation", "NOT KNOWN")
             copyright = package.get("copyrighttext", "-")
-            sbom_document.addrow([name, version, purl, cpe, type, supplier, license, ecosystem, download, copyright])
+            sbom_document.addrow(
+                [
+                    name,
+                    version,
+                    purl,
+                    cpe,
+                    type,
+                    supplier,
+                    license,
+                    ecosystem,
+                    download,
+                    copyright,
+                ]
+            )
             if (
                 id is None
                 or name is None
@@ -207,11 +232,11 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
 
     if len(vulnerabilities) > 0:
         sbom_document.heading(1, "Vulnerabilities Summary")
-        sbom_document.createtable(["Id", "Source", "Status" ])
+        sbom_document.createtable(["Id", "Source", "Status"])
         for vulnerability in vulnerabilities:
             id = vulnerability["id"]
-            status = vulnerability.get("status","-")
-            source = vulnerability.get("source","-")
+            status = vulnerability.get("status", "-")
+            source = vulnerability.get("source", "-")
             sbom_document.addrow([id, source, status])
         sbom_document.showtable(widths=[3, 2, 4, 5])
 
@@ -222,7 +247,7 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
             # Ignore undefined licenses or expressions
             if key == "NOASSERTION" or license_info.license_expression(key):
                 continue
-            license_url = f"https://spdx.org/licenses/{key}.json"
+            # license_url = f"https://spdx.org/licenses/{key}.json"
             try:
                 license_text = license_info.get_license_text(key)
                 if len(license_text) > 0:
