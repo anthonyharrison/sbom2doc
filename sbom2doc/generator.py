@@ -224,10 +224,14 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
                 continue
             license_url = f"https://spdx.org/licenses/{key}.json"
             try:
-                license_text = requests.get(license_url).json()
-                if license_text.get("licenseText") is not None:
+                license_text = license_info.get_license_text(key)
+                if len(license_text) > 0:
                     sbom_document.heading(2, key, number=False)
-                    sbom_document.paragraph(license_text["licenseText"])
+                    sbom_document.paragraph(license_text)
+                # license_text = requests.get(license_url).json()
+                # if license_text.get("licenseText") is not None:
+                #     sbom_document.heading(2, key, number=False)
+                #     sbom_document.paragraph(license_text["licenseText"])
             except requests.exceptions.RequestException:
                 sbom_document.heading(2, key, number=False)
                 sbom_document.paragraph("Unable to find license text.")
