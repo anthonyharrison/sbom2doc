@@ -139,6 +139,9 @@ def generate_document(format, sbom_parser, filename, outfile, include_license):
                         cpe = reference[2]
             download = package.get("downloadlocation", "NOT KNOWN")
             copyright = package.get("copyrighttext", "-")
+            if isinstance(sbom_document, MarkdownBuilder):
+                purl = f"`{purl}`" if purl else ""
+                cpe = f"`{cpe}`" if cpe else ""
             sbom_document.addrow(
                 [
                     name,
